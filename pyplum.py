@@ -1,7 +1,6 @@
 import pdfplumber
 import pandas as pd
-from pythainlp.util import normalize
-from pythainlp import correct
+
 
 def extract_table_from_pdf(pdf_path, page_number, empty = True):
     with pdfplumber.open(pdf_path) as pdf:
@@ -19,21 +18,25 @@ def extract_table_from_pdf(pdf_path, page_number, empty = True):
             return table
         else:
             return table
+        
+# Linux
+# list = extract_table_from_pdf("/mnt/c/Users/tgsav/OneDrive/Desktop/pdf-to-excel/test/test2.pdf", 0)
 
-list = extract_table_from_pdf("/mnt/c/Users/tgsav/OneDrive/Desktop/pdf-to-excel/test/test2.pdf", 0, False)
+# Windows
+list = extract_table_from_pdf(r"C:\Users\tgsav\OneDrive\Desktop\pdf-to-excel\test\Pre-Freshy_2022.pdf", 0)
 
-for i in range(len(list)):
-    for x in range(len(list[i])):
-        print(list[i][x])
-        list[i][x] = list[i][x].replace(" ", "")
-        text = list[i][x]
-        text = normalize(text)
-        list[i][x] = text
+# NO NEED TO USE (Reduce a space between char)
+# for i in range(len(list)):
+#     for x in range(len(list[i])):
+#         print(list[i][x])
+#         list[i][x] = list[i][x].replace(" ", "")
+#         text = list[i][x]
+#         text = normalize(text)
+#         list[i][x] = text
 
 print(list)
-
 df = pd.DataFrame(list)
 
 print(df)
 
-df.to_csv('out.csv',index=False)
+# df.to_csv('out.csv',index=False)
