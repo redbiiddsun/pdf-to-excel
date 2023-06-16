@@ -1,10 +1,11 @@
+from typing import List
 import sys
 import PyPDF2
 import tabula
 import pandas as pd
 import difflib
 import re
-import numpy
+from typing import List
 
 
 def convertAllInDirectory(dir, format):
@@ -13,16 +14,24 @@ def convertAllInDirectory(dir, format):
     except Exception as e:
         print(e)
 
+def convert_to_int(user_input_str):
+    input_list_str = list(user_input_str.split(","))
+    number_list = []
+    for n in input_list_str:
+        if '-' not in n:
+            number_list.append(int(n))
+        else:
+            number_list.extend(range(int(n.split('-')[0]), int(n.split('-')[1]) + 1))
+    return number_list
 
-
-def correct_wordlist(dir):
+def correct_wordlist(dir: str,page: str):
     try:
         reader = PyPDF2.PdfReader(dir)
-        number_of_pages = len(reader.pages)
+        number_of_pages = 0
 
         allText = []
 
-        for page_num in range(number_of_pages):
+        for page_num in range(number_of_pages) if page == 'all' else convert_to_int(page):
 
             #Set Page number to PDFreader
             page = reader.pages[page_num]
@@ -42,22 +51,24 @@ def correct_wordlist(dir):
         print(e)
         sys.exit()
 
-dirs = r"/mnt/c/Users/tgsav/OneDrive/Desktop/pdf-to-excel/test/test2.pdf"
+dirs = r"/mnt/c/Users/tgsav/OneDrive/Desktop/pdf-to-excel/test/test3.pdf"
 
-df = tabula.read_pdf(dirs, pages='all', stream = True)
-wordlist = correct_wordlist(dirs)
+df = tabula.read_pdf(dirs, pages='10')
+wordlist = correct_wordlist(dirs, '9') # Becareful pagenum this need to be page-1
 list = []
 
 for i in df:
-    list.append(i.values.tolist())
-
-def find_similar_word(word, word_list):
+    list.append(i.T.reset_index().values.T.tolist())
+    
+def find_similar_word(word: str, word_list: List[str]):
     try:
         matches = difflib.get_close_matches(word, word_list, n=1)
+        
         return word if len(matches) == 0 else matches[0]
     except Exception as e:
         return word
-    
+
+print(wordlist)
 
 for i in range(len(list)):
     for x in range(len(list[i])):
@@ -66,8 +77,13 @@ for i in range(len(list)):
                 continue
             else:
                 # print("text")
+                # print(list[i][x][k])
+                # print('------------------------')
+                # print(find_similar_word(list[i][x][k], wordlist))
                 list[i][x][k] = find_similar_word(list[i][x][k], wordlist)
-            # print(list[i][x][k])
+                
+
+
 
 print(list)
 
