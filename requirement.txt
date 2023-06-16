@@ -1,2 +1,4 @@
 pdfplumber
+tabular
 pandas
+colorlog
